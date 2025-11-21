@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.permissions import AllowAny,IsAuthenticated
-from Users.permission import Isauthor
+from Users.permission import IsOwner
 from Users.models import Note, user
 from Users.serializers import NoteSerializer, user_serializers
 from rest_framework.response import Response
@@ -26,13 +26,12 @@ class create_user(generics.CreateAPIView):
 
 
 class create_note(generics.CreateAPIView):
-   # permission_classes = [AllowAny]
     serializer_class = NoteSerializer
     queryset = Note.objects.all()
 
 
 class veiw_user_notes(generics.ListAPIView):
-    permission_classes = [Isauthor,IsAuthenticated]
+    permission_classes = [IsOwner,IsAuthenticated]
     serializer_class = NoteSerializer
     pagination_class = NotePagination
     queryset = Note.objects.select_related("owner").all()
@@ -44,13 +43,13 @@ class veiw_user_notes(generics.ListAPIView):
         return qs.filter(owner=user)
 
 class update_note(generics.UpdateAPIView):
-    permission_classes = [Isauthor,IsAuthenticated]
+    permission_classes = [IsOwner,IsAuthenticated]
     serializer_class = NoteSerializer
     queryset=Note.objects.select_related("owner").all()
 
 
 class delete_note(generics.DestroyAPIView):
-    permission_classes = [Isauthor,IsAuthenticated]
+    permission_classes = [IsOwner,IsAuthenticated]
     serializer_class = NoteSerializer
     queryset=queryset = Note.objects.all()
 
@@ -63,34 +62,9 @@ class delete_note(generics.DestroyAPIView):
         status=status.HTTP_200_OK)
 
 
-
-
 class note_detail(generics.RetrieveAPIView):
-    permission_classes = [Isauthor,IsAuthenticated]
+    permission_classes = [IsOwner,IsAuthenticated]
     serializer_class = NoteSerializer
     queryset=Note.objects.select_related("owner").all()
 
-
-# class test1(generics.CreateAPIView):
-#     serializer_class = test1_serializers
-#     queryset = test1.objects.all()
-
-
-# class test2(generics.CreateAPIView):
-#     serializer_class = test2_serializers
-#     queryset = test2.objects.all()
-
-
-# class LoginAPIView(APIView):
-#         serializer_class = LoginSerializer
-#         authentication_classes = [TokenAuthentication]
-    
-#         def post(self, request):
-#             serializer = LoginSerializer(data = request.data)
-#             if serializer.is_valid(raise_exception=True):
-#                 user = authenticate(username=serializer.data['username'], password=serializer.data['password'])
-#                 if user:
-#                     token, created = Token.objects.get_or_create(user=user)
-#                     return Response({'token': [token.key], "Sucsses":"Login SucssesFully"}, status=status.HTTP_201_CREATED )
-#                 return Response({'Massage': 'Invalid Username and Password'}, status=401)
 

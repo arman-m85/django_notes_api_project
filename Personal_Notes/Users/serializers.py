@@ -11,12 +11,10 @@ class user_serializers(serializers.ModelSerializer):
         fields = ["id","email","password","phone_number","date_joined"]
 
 class NoteSerializer(serializers.ModelSerializer):
-    #owner = user_serializers(read_only=True,source='user')
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
         result["owner"] = user_serializers(instance.owner).data
-        
         
         return result
 
